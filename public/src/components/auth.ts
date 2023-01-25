@@ -1,17 +1,24 @@
 import firebase from '../initializeFirebase';
-import { GoogleAuthProvider } from 'firebase/auth';
+import { GoogleAuthProvider, PhoneAuthProvider } from 'firebase/auth';
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
 import './auth.scss'
+import firebaseCompat from "firebase/compat/app";
+import "firebase/compat/auth";
 
 const uiConfig: firebaseui.auth.Config = {
   signInSuccessUrl: '/',
   signInOptions: [
-    GoogleAuthProvider.PROVIDER_ID
-  ]
+    GoogleAuthProvider.PROVIDER_ID,
+    {
+      provider: PhoneAuthProvider.PROVIDER_ID,
+      defaultCountry: 'IN'
+    }
+  ],
+
 }
 
-const ui = new firebaseui.auth.AuthUI(firebase.auth)
+const ui = new firebaseui.auth.AuthUI(firebaseCompat.auth())
 
 const authComponent = document.createElement('div')
 authComponent.classList.add('auth')
@@ -35,12 +42,13 @@ logoutBtn.addEventListener('click', () => {
 
 firebase.auth.onAuthStateChanged(user => {
   const userNameElement = authComponent.querySelector('.info')!.querySelector('span')!
-  userNameElement.innerHTML = user?.displayName ?? 'Anonymous'
-  if(user){
+  userNameElement.innerHTML = user?.displayName ?? user?.phoneNumber ?? 'Anonymous'
+  if (user) {
     loginBtn.classList.add('hide')
     logoutBtn.classList.remove('hide')
+    ui.reset()
   }
-  else{
+  else {
     loginBtn.classList.remove('hide')
     logoutBtn.classList.add('hide')
   }
