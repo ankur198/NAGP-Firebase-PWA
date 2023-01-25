@@ -1,5 +1,5 @@
 import firebase from '../initializeFirebase';
-import { GoogleAuthProvider, PhoneAuthProvider } from 'firebase/auth';
+import { EmailAuthProvider, GoogleAuthProvider, PhoneAuthProvider } from 'firebase/auth';
 import * as firebaseui from 'firebaseui'
 import 'firebaseui/dist/firebaseui.css'
 import './auth.scss'
@@ -13,7 +13,8 @@ const uiConfig: firebaseui.auth.Config = {
     {
       provider: PhoneAuthProvider.PROVIDER_ID,
       defaultCountry: 'IN'
-    }
+    },
+    EmailAuthProvider.PROVIDER_ID
   ],
 
 }
@@ -44,6 +45,7 @@ firebase.auth.onAuthStateChanged(user => {
   const userNameElement = authComponent.querySelector('.info')!.querySelector('span')!
   userNameElement.innerHTML = user?.displayName ?? user?.phoneNumber ?? 'Anonymous'
   if (user) {
+    console.log(user)
     loginBtn.classList.add('hide')
     logoutBtn.classList.remove('hide')
     ui.reset()
